@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Погода</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Данные о погоде</h1>
+    <div id="temperature_humidity_plot"></div>
+    <div id="soil_moisture_plot"></div>
+
+    <script>
+        // Получение данных из Flask-приложения
+        fetch('/get_data')
+            .then(response => response.json())
+            .then(data => {
+                // Создание графиков с помощью Plotly.js
+                createTemperatureHumidityPlot('temperature_humidity_plot', data, 'Температура и влажность', 'temperature', 'red', 'humidity', 'blue');
+                createSoilMoisturePlot('soil_moisture_plot', data, 'Влажность почвы', 'soil_moisture', 'green');
+            });
+
+        function createTemperatureHumidityPlot(id, data, title, temperature_yaxis_title, temperature_color, humidity_yaxis_title, humidity_color) {
+            var temperature_trace = {
+                x: data.map(item => {
+                    var localTime = new Date(item.created_at);
+                    localTime.setHours(localTime.getHours() - 3);
+                    return localTime;
+                }),
+                y: data.map(item => item[temperature_yaxis_title]),
+                type: 'scatter',
+                name: temperature_yaxis_title,
+                marker: {
+                    color: temperature_color
+                }
+            };
+
+            var humidity_trace = {
+                x: data.map(item => {
+                    var localTime = new Date(item.created_at);
+                    localTime.setHours(localTime.getHours() - 3);
+                    return localTime;
+                }),
+                y: data.map(item => item[humidity_yaxis_title]),
+                type: 'scatter',
+                name: humidity_yaxis_title,
+                marker: {
+                    color: humidity_color
+                },
+                yaxis: 'y2'
+            };
+
+            var layout = {
+                title: title,
+                xaxis: {
+                    title: 'Время',
+                    type: 'date'
+                },
+                yaxis: {
+                    title: temperature_yaxis_title
+                },
+                yaxis2: {
+                    title: humidity_yaxis_title,
+                    overlaying: 'y',
+                    side: 'right'
+                },
+                legend: {
+                    x: 0.1,
+                    y: 1.1,
+                    orientation: 'h'
+                }
+            };
+
+            Plotly.newPlot(id, [temperature_trace, humidity_trace], layout);
+        }
+
+        function createSoilMoisturePlot(id, data, title, soil_moisture_yaxis_title, soil_moisture_color) {
+            var soil_moisture_trace = {
+                x: data.map(item => {
+                    var localTime = new Date(item.created_at);
+                    localTime.setHours(localTime.getHours() - 3);
+                    return localTime;
+                }),
+                y: data.map(item => item[soil_moisture_yaxis_title]),
+                type: 'scatter',
+                name: soil_moisture_yaxis_title,
+                marker: {
+                    color: soil_moisture_color
+                }
+            };
+
+            var layout = {
+                title: title,
+                xaxis: {
+                    title: 'Время',
+                    type: 'date'
+                },
+                yaxis: {
+                    title: soil_moisture_yaxis_title
+                }
+            };
+
+            Plotly.newPlot(id, [soil_moisture_trace], layout);
+        }
+    </script>
+</body>
+</html>

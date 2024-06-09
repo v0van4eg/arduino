@@ -1,0 +1,10 @@
+services:
+  arduino:
+    build: .
+    image: arduino
+    container_name: arduino
+    volumes:
+      - ./templates/index.html:/app/templates/index.html
+    ports:
+      - 5001:5001
+
