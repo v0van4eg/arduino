@@ -1,7 +1,7 @@
 services:
   arduino:
     build: .
-    image: arduino
+    image: v0van4eg/arduino
     container_name: arduino
     volumes:
       - ./templates/index.html:/app/templates/index.html
